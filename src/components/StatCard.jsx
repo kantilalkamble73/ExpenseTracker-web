@@ -2,7 +2,8 @@ import React from 'react';
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 
 export default function StatCard({ label, value, icon: Icon, trend, trendLabel, accent }) {
-  const isPositive = trend !== undefined && trend >= 0;
+  const hasTrend = typeof trend === 'number' && !isNaN(trend);
+  const isPositive = hasTrend && trend >= 0;
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-card p-5 hover:shadow-card-hover transition-shadow">
       <div className="flex items-start justify-between">
@@ -16,7 +17,7 @@ export default function StatCard({ label, value, icon: Icon, trend, trendLabel, 
           </div>
         )}
       </div>
-      {trend !== undefined && (
+      {hasTrend && (
         <div className="flex items-center gap-1 mt-3">
           {isPositive ? (
             <ArrowUpRight size={14} className="text-red-500" />

@@ -8,11 +8,13 @@ const labelColors = {
   'Needs Attention': { ring: '#ef4444', bg: 'bg-red-50 dark:bg-red-500/10', text: 'text-red-700 dark:text-red-400' },
 };
 
-export default function HealthGauge({ score, label, breakdown }) {
+export default function HealthGauge({ score = 0, label = 'Fair', breakdown = [] }) {
   const cfg = labelColors[label] || labelColors.Fair;
+  const safeScore = typeof score === 'number' ? Math.max(0, Math.min(100, score)) : 0;
   const radius = 54;
   const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (score / 100) * circumference;
+  const offset = circumference - (safeScore / 100) * circumference;
+  const safeBreakdown = Array.isArray(breakdown) ? breakdown : [];
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-card p-5 h-full">
@@ -33,7 +35,7 @@ export default function HealthGauge({ score, label, breakdown }) {
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-2xl font-bold text-slate-800 dark:text-slate-100">{score}</span>
+            <span className="text-2xl font-bold text-slate-800 dark:text-slate-100">{safeScore}</span>
             <span className="text-[10px] text-slate-400 dark:text-slate-500">/ 100</span>
           </div>
         </div>
@@ -43,7 +45,7 @@ export default function HealthGauge({ score, label, breakdown }) {
             {label}
           </span>
           <div className="space-y-2">
-            {breakdown.map((f) => (
+            {safeBreakdown.map((f) => (
               <div key={f.label}>
                 <div className="flex justify-between text-[11px] text-slate-500 dark:text-slate-400 mb-0.5">
                   <span>{f.label}</span>
@@ -52,7 +54,7 @@ export default function HealthGauge({ score, label, breakdown }) {
                 <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full bg-primary-500"
-                    style={{ width: `${(f.score / f.max) * 100}%` }}
+                    style={{ width: `${f.max ? (f.score / f.max) * 100 : 0}%` }}
                   />
                 </div>
               </div>

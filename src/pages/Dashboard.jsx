@@ -72,10 +72,30 @@ export default function Dashboard() {
     }
   };
 
-  if (loading && !data) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="w-10 h-10 border-4 border-primary-200 dark:border-primary-900 border-t-primary-600 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-card p-12 text-center max-w-lg mx-auto mt-12">
+        <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto mb-4">
+          <Receipt size={24} />
+        </div>
+        <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">Unable to Load Dashboard</h3>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+          Could not fetch your financial summary. Please check your connection or try again.
+        </p>
+        <button
+          onClick={() => fetchDashboard(month, year)}
+          className="px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-xl transition-colors shadow-card"
+        >
+          Try Again
+        </button>
       </div>
     );
   }
@@ -132,7 +152,7 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-1">
-          <HealthGauge score={data.healthScore} label={data.healthLabel} breakdown={data.healthBreakdown} />
+          <HealthGauge score={data.healthScore} label={data.healthLabel} breakdown={data.healthBreakdown || []} />
         </div>
 
         <div className="lg:col-span-2 bg-gradient-to-br from-primary-600 to-primary-800 rounded-2xl p-5 sm:p-6 shadow-card-hover">
@@ -141,7 +161,7 @@ export default function Dashboard() {
             <h3 className="text-white font-semibold">Smart Insights</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {data.smartInsights.map((insight, idx) => (
+            {(data.smartInsights || []).map((insight, idx) => (
               <div key={idx} className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 text-sm text-white/95 border border-white/10">
                 {insight}
               </div>
@@ -157,7 +177,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         <div className="lg:col-span-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-card p-5">
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4">Daily Spending Trend</h3>
-          {data.dailyTrend.length === 0 ? (
+          {(!data.dailyTrend || data.dailyTrend.length === 0) ? (
             <EmptyChart label="No expenses recorded for this month yet." />
           ) : (
             <ResponsiveContainer width="100%" height={260}>
@@ -180,7 +200,7 @@ export default function Dashboard() {
 
         <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-card p-5">
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4">Category Breakdown</h3>
-          {data.categoryBreakdown.length === 0 ? (
+          {(!data.categoryBreakdown || data.categoryBreakdown.length === 0) ? (
             <EmptyChart label="No category data yet." />
           ) : (
             <>
@@ -214,7 +234,7 @@ export default function Dashboard() {
         <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-card p-5">
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4">Last 6 Months</h3>
           <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={data.monthlyTrend}>
+            <BarChart data={data.monthlyTrend || []}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-slate-100 dark:stroke-slate-800" vertical={false} />
               <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
@@ -226,7 +246,7 @@ export default function Dashboard() {
 
         <div className="lg:col-span-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-card p-5">
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4">Top Expenses This Month</h3>
-          {data.topExpenses.length === 0 ? (
+          {(!data.topExpenses || data.topExpenses.length === 0) ? (
             <EmptyChart label="No expenses to rank yet." />
           ) : (
             <div className="space-y-3">
